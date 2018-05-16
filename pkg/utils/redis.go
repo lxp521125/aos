@@ -50,26 +50,3 @@ func (rc *RedisClient) GetData(key string) interface{} {
 	}
 	return val
 }
-
-/*
-
-client := redis.NewClient(&redis.Options{
-	Addr:     "dev.redis.gaodunwangxiao.com:6379",
-	Password: "gaodun.com", // no password set
-	DB:       0,            // use default DB
-})
-
-pong, err := client.Ping().Result()
-fmt.Println("client pong：", pong, err)
-
-err = client.Set("key", "valueStone", 0).Err()
-if err != nil {
-	panic(err)
-}
-
-val, err := client.Get("key").Result()
-if err != nil {
-	panic(err)
-}
-fmt.Println("key", val)
-*/
