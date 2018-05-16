@@ -22,33 +22,6 @@ type ResponseObject struct {
 	Result  interface{} `json:"result"`
 }
 
-// TODO: 处理HTTP响应包括错误的公共方法
-func Dump(c *gin.Context, err error, object interface{}) {
-	responseObject := ResponseObject{
-		1,
-		err.Error(),
-		object,
-	}
-	if nil != err {
-		c.JSON(http.StatusOK, responseObject)
-	} else {
-		c.JSON(http.StatusOK, responseObject)
-	}
-}
-
-func CreateSecretFromRequest(c *gin.Context) secret.Secret {
-	accessKey := c.PostForm("access_key")
-	if accessKey == "" {
-		accessKey = c.Param("access_key")
-	}
-	accessSecret := c.DefaultQuery("access_secret", "")
-
-	return secret.Secret{
-		accessKey,
-		accessSecret,
-	}
-}
-
 // TODO:
 // 输出HTTP处理日志
 // 配置权限、用户状态等对象容器
@@ -111,41 +84,10 @@ func main() {
 	// 	server.SignalHooks[endless.POST_SIGNAL][syscall.SIGUSR1],
 	// 	postSigUsr1)
 
-	// // setting.Logger.Info("I am tester shengji")
-
-	// // TODO: 对象依赖配置放到专门的模块
-	// var (
-	// 	secretDAO           = persistence.NewSecretDAO(client)
-	// 	secretServiceFacade = secret.NewSecretServiceFacadeImpl(
-	// 		secretDAO,
-	// 		secret.NewSecretFactory(),
-	// 	)
-	// )
 
 	// router := gin.Default()
 
 	// gin.SetMode(setting.RunMode)
-
-	// // TODO: Controller 放置到专门的模块内
-	// router.POST("/secret", func(c *gin.Context) {
-	// 	authentication := CreateSecretFromRequest(c)
-
-	// 	newSecret, err := secretServiceFacade.Add(authentication)
-	// 	if nil != err {
-	// 		fmt.Println(err)
-	// 	}
-
-	// 	c.JSON(http.StatusOK, newSecret)
-	// })
-
-	// router.Use(ResponseMiddleware())
-	// router.Use(logs.Logger())
-
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	// apiv1 := router.Group("/v1")
-
-	// apiv1.GET("/secret/:access_key", getS)
 
 	// router.Run(":6001")
 }
