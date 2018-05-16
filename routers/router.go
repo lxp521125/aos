@@ -33,7 +33,6 @@ func InitRouter() *gin.Engine {
 		MaxAge: 12 * time.Hour,
 	}))
 
-
 	r.Use(logs.Logger())
 	r.Use(gin.Recovery())
 	r.Use(panicHandle.CatchError())
@@ -45,8 +44,6 @@ func InitRouter() *gin.Engine {
 	c1 := r.Group("/v1")
 
 	//test
-	c1.GET("/dbtest", containerInstance.TestApi.GetDbTest)
-	c1.GET("/servicetest", containerInstance.TestApi.GetServiceTest)
 	c1.GET("/graylog", containerInstance.TestApi.TestGraylog)
 
 	//static

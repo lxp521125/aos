@@ -1,6 +1,7 @@
 package setting
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -9,13 +10,11 @@ import (
 	"github.com/apex/log/handlers/graylog"
 	"github.com/apex/log/handlers/multi"
 	"github.com/apex/log/handlers/text"
-	"github.com/go-ini/ini"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
 
 var (
-	Cfg *ini.File
-
 	RunMode string
 
 	HTTPPort               int
@@ -48,40 +47,48 @@ var TimeTags = map[string]int{
 //var Logger *log.Entry
 // TODO log 不应该在setting当中
 var Logger *log.Entry
+var grayLog log.Handler
 
 func LoadConfig() {
-	var err error
-	Cfg, err = ini.Load("conf/app.ini")
-	if err != nil {
-		// log.Fatalf("Fail to parse 'conf/app.ini': %v", err)
-	}
+
 	loadBase()
 	loadServer()
 	loadApp()
 	// 设置log
+	grayLog = getGrayLog()
 	Logger = GrayLog()
 }
 
 func loadBase() {
-
+	cmdRoot := "app"
+	viper.SetEnvPrefix(cmdRoot)
+	viper.AutomaticEnv()
+	replacer := strings.NewReplacer(".", "_")
+	viper.SetEnvKeyReplacer(replacer)
+	viper.SetConfigName(cmdRoot)
+	viper.AddConfigPath("./conf")
+	viper.SetConfigType("yaml")
+	// gopath := os.Getenv("GOPATH")
+	// for _, p := range filepath.SplitList(gopath) {
+	// 	peerpath := filepath.Join(p, "src/vip")
+	// 	viper.AddConfigPath(peerpath)
+	// }
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		fmt.Println(fmt.Errorf("Fatal error when reading %s config file: %s\n", cmdRoot, err))
+	}
 }
 
-var grayLog = getGrayLog()
-
 func getGrayLog() log.Handler {
-	Cfg, _ = ini.Load("conf/app.ini")
-	graylogInfo, _ := Cfg.GetSection("log")
-	e, err := graylog.New(graylogInfo.Key("LOG_UDP").MustString("udp://g02.graylog.gaodunwangxiao.com:5504"))
+	e, err := graylog.New(viper.GetString("log.LOG_UDP"))
 	if err != nil {
 		return &l
 	}
-
 	return e
 }
 
 func GrayLog(newFields ...map[string]interface{}) *log.Entry {
-	graylogInfo, _ := Cfg.GetSection("log")
-	isShowConsole := graylogInfo.Key("IS_SHOW_CONSOLE").MustBool(false)
+	isShowConsole := viper.GetBool("log.IS_SHOW_CONSOLE")
 	if isShowConsole {
 		t := text.New(os.Stderr)
 		log.SetHandler(multi.New(grayLog, t))
@@ -90,7 +97,7 @@ func GrayLog(newFields ...map[string]interface{}) *log.Entry {
 	}
 
 	fields := make(log.Fields)
-	grayFields := graylogInfo.Key("LOG_FIELDS").MustString("item:ginlog")
+	grayFields := viper.GetString("log.LOG_FIELDS")
 	grayFieldsArray := strings.Split(grayFields, ",")
 	if len(grayFieldsArray) > 0 {
 		for i := 0; i < len(grayFieldsArray); i++ {
@@ -106,17 +113,16 @@ func GrayLog(newFields ...map[string]interface{}) *log.Entry {
 			fields[k] = v
 		}
 	}
-	level := graylogInfo.Key("LOG_LEVEL").MustInt(-1)
+	level := viper.GetInt("log.LOG_LEVEL")
 	log.SetLevel(log.Level(level))
 	return log.WithFields(fields)
 }
 
 func Logrus(newFields ...map[string]interface{}) *logrus.Entry {
-	graylogInfo, _ := Cfg.GetSection("log")
-	level := graylogInfo.Key("LOG_LEVEL").MustInt(-1)
+	level := viper.GetInt("log.LOG_LEVEL")
 	logrus.SetLevel(logrus.Level(level))
 	fields := make(logrus.Fields)
-	grayFields := graylogInfo.Key("LOG_FIELDS").MustString("item:ginlog")
+	grayFields := viper.GetString("log.LOG_FIELDS")
 	grayFieldsArray := strings.Split(grayFields, ",")
 	if len(grayFieldsArray) > 0 {
 		for i := 0; i < len(grayFieldsArray); i++ {
@@ -134,29 +140,34 @@ func Logrus(newFields ...map[string]interface{}) *logrus.Entry {
 	return logrus.WithFields(fields)
 }
 func loadServer() {
-	sec, err := Cfg.GetSection("server")
-	if err != nil {
-		// Logger.Fatalf("Fail to get section 'server': %v", err)
+	if viper.IsSet("RUN_MODE") {
+		RunMode = viper.GetString("RUN_MODE")
+	} else {
+		RunMode = "debug"
 	}
 
-	RunMode = Cfg.Section("").Key("RUN_MODE").MustString("debug")
+	if viper.IsSet("server.HTTP_PORT") {
+		HTTPPort = viper.GetInt("server.HTTP_PORT")
+	} else {
+		HTTPPort = 6001
+	}
+	if viper.IsSet("server.READ_TIMEOUT") {
+		ReadTimeout = viper.GetDuration("server.READ_TIMEOUT")
+	} else {
+		ReadTimeout = 60
+	}
 
-	HTTPPort = sec.Key("HTTP_PORT").MustInt(8000)
-	ReadTimeout = time.Duration(sec.Key("READ_TIMEOUT").MustInt(60)) * time.Second
-	WriteTimeout = time.Duration(sec.Key("WRITE_TIMEOUT").MustInt(60)) * time.Second
-
-	apiSection, err := Cfg.GetSection("api")
-	ResourceVideoSrc = apiSection.Key("RESOURCE_VIDEO_SRC").String()
-	ResourceLectureNoteSrc = apiSection.Key("RESOURCE_LECTURENOTE_SRC").String()
-	UserTokenSrc = apiSection.Key("USER_TOKEN_API").String()
+	if viper.IsSet("server.WRITE_TIMEOUT") {
+		WriteTimeout = viper.GetDuration("server.WRITE_TIMEOUT")
+	} else {
+		WriteTimeout = 60
+	}
 }
 
 func loadApp() {
-	sec, err := Cfg.GetSection("app")
-	if err != nil {
-		// Logger.Fatalf("Fail to get section 'app': %v", err)
+	if viper.IsSet("app.PAGE_SIZE") {
+		PageSize = viper.GetInt("app.PAGE_SIZE")
+	} else {
+		PageSize = 10
 	}
-
-	// JwtSecret = sec.Key("JWT_SECRET").MustString("!@)*#)!@U#@*!@!)")
-	PageSize = sec.Key("PAGE_SIZE").MustInt(10)
 }

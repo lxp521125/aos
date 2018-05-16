@@ -3,7 +3,6 @@ package main
 import (
 	_ "aos/docs"
 	"aos/routers"
-	"aos/secret"
 	"fmt"
 	"log"
 	"net/http"
@@ -72,22 +71,4 @@ func main() {
 	if err != nil {
 		log.Printf("Server err: %v", err)
 	}
-	//server := endless.NewServer(endPoint,routers.InitRouter() )
-	//server.BeforeBegin = func(add string) {
-	//	fmt.Println("Actual pid is %d", syscall.Getpid())
-	//}
-
-	// server.SignalHooks[endless.PRE_SIGNAL][syscall.SIGUSR1] = append(
-	// 	server.SignalHooks[endless.PRE_SIGNAL][syscall.SIGUSR1],
-	// 	preSigUsr1)
-	// server.SignalHooks[endless.POST_SIGNAL][syscall.SIGUSR1] = append(
-	// 	server.SignalHooks[endless.POST_SIGNAL][syscall.SIGUSR1],
-	// 	postSigUsr1)
-
-
-	// router := gin.Default()
-
-	// gin.SetMode(setting.RunMode)
-
-	// router.Run(":6001")
 }

@@ -21,6 +21,6 @@ func Logger() gin.HandlerFunc {
 		t := time.Now()
 		c.Next()
 		latency := time.Since(t)
-		logger.Infof("接口："+c.Request.URL.Path+"，请求时间为：", latency)
+		logger.Infof("interface url:"+c.Request.URL.Path+"，times:", latency)
 	}
 }

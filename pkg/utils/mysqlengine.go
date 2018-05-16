@@ -84,7 +84,7 @@ func InitEngine() error {
 
 	for i := 0; i < DB_LIST_COUNT; i++ {
 		engineList[i], err = xorm.NewEngine(configInfo[i].DriverName, configInfo[i].DriverDns)
-		RetryLog("start : " + configInfo[i].DriverDns)
+		RetryLog("start Db : " + configInfo[i].DriverDns)
 		if err != nil {
 			RetryLog("db err : " + err.Error() + configInfo[i].DriverName + configInfo[i].DriverDns)
 			return err
