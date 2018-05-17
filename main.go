@@ -57,7 +57,8 @@ func main() {
 	setting.LoadConfig()
 	// init db
 	if err := utils.InitEngine(); err != nil {
-		panic(err)
+		fmt.Println("数据库连接异常：", err)
+		// panic(err)
 		os.Exit(0)
 	}
 

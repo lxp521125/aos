@@ -25,6 +25,8 @@ var (
 	UserTokenSrc           string // user token 调用地址
 	PageSize               int
 	JwtSecret              string
+	CONSUL_URL             string
+	CONSUL_LIST_NAME       string
 )
 
 const (
@@ -52,6 +54,7 @@ var grayLog log.Handler
 func LoadConfig() {
 
 	loadBase()
+	loadOTher()
 	loadServer()
 	loadApp()
 	// 设置log
@@ -169,5 +172,18 @@ func loadApp() {
 		PageSize = viper.GetInt("app.PAGE_SIZE")
 	} else {
 		PageSize = 10
+	}
+}
+
+func loadOTher() {
+	if viper.IsSet("consul.CONSUL_URL") {
+		CONSUL_URL = viper.GetString("consul.CONSUL_URL")
+	} else {
+		CONSUL_URL = ""
+	}
+	if viper.IsSet("consul.CONSUL_LIST_NAME") {
+		CONSUL_LIST_NAME = viper.GetString("consul.CONSUL_LIST_NAME")
+	} else {
+		CONSUL_LIST_NAME = ""
 	}
 }

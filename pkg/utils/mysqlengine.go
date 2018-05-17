@@ -26,6 +26,9 @@ func GetDBEng(engine *xorm.Engine, databaseNum int) func() (interface{}, error) 
 		err := engine.Ping()
 		if err != nil {
 			configInfo, _ := dbconf.GetMySqlConfig()
+			if configInfo == nil {
+				return nil, errors.New(0, "consul 配置为空")
+			}
 			engine, _ = xorm.NewEngine(configInfo[databaseNum].DriverName, configInfo[databaseNum].DriverDns)
 			return nil, err
 		}
@@ -76,6 +79,9 @@ func InitEng(databaseNum int) (*xorm.Engine, error) {
 // 创建 连接并且缓存
 func InitEngine() error {
 	configInfo, err := dbconf.GetMySqlConfig()
+	if configInfo == nil {
+		return errors.New(0, "consul 配置为空")
+	}
 	if err != nil {
 		return errors.New(0, err.Error())
 	}

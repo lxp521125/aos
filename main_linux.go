@@ -2,7 +2,6 @@ package main
 
 import (
 	"aos/routers"
-	"aos/secret"
 	"fmt"
 	"log"
 	"net/http"
@@ -33,19 +32,6 @@ func Dump(c *gin.Context, err error, object interface{}) {
 		c.JSON(http.StatusOK, responseObject)
 	} else {
 		c.JSON(http.StatusOK, responseObject)
-	}
-}
-
-func CreateSecretFromRequest(c *gin.Context) secret.Secret {
-	accessKey := c.PostForm("access_key")
-	if accessKey == "" {
-		accessKey = c.Param("access_key")
-	}
-	accessSecret := c.DefaultQuery("access_secret", "")
-
-	return secret.Secret{
-		accessKey,
-		accessSecret,
 	}
 }
 

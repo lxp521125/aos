@@ -12,7 +12,10 @@ type RedisClient struct {
 	RedisClientHandle *redis.Client
 }
 
-var RedisHandle = initRedisClient()
+func GetRedisHandle() *RedisClient {
+	//  RedisHandle = initRedisClient()
+	return initRedisClient()
+}
 
 func initRedisClient() *RedisClient {
 	var redisStuct = new(RedisClient)
@@ -21,11 +24,12 @@ func initRedisClient() *RedisClient {
 }
 
 func getClient() *redis.Client {
-
+	consulInfo, _ := consul.InitConfig()
+	fmt.Println("redis.go")
 	client := redis.NewClient(&redis.Options{
-		Addr:     consul.GdConsul["PUBLIC_REDIS_HOST"] + ":" + consul.GdConsul["PUBLIC_REDIS_PORT"],
-		Password: consul.GdConsul["PUBLIC_REDIS_PASSWD"], // no password set
-		DB:       0,                                      // use default DB
+		Addr:     consulInfo["PUBLIC_REDIS_HOST"] + ":" + consulInfo["PUBLIC_REDIS_PORT"],
+		Password: consulInfo["PUBLIC_REDIS_PASSWD"], // no password set
+		DB:       0,                                 // use default DB
 	})
 	pong, _ := client.Ping().Result()
 

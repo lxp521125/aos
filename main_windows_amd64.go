@@ -1,20 +1,20 @@
 package main
 
 import (
+	_ "aos/docs"
 	"aos/routers"
-	"aos/secret"
 	"fmt"
 	"net/http"
-	_ "aos/docs"
 
 	"aos/pkg/setting"
 
-	"github.com/gin-gonic/gin"
+	"aos/pkg/utils"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"aos/pkg/utils"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ResponseObject struct {
@@ -34,19 +34,6 @@ func Dump(c *gin.Context, err error, object interface{}) {
 		c.JSON(http.StatusOK, responseObject)
 	} else {
 		c.JSON(http.StatusOK, responseObject)
-	}
-}
-
-func CreateSecretFromRequest(c *gin.Context) secret.Secret {
-	accessKey := c.PostForm("access_key")
-	if accessKey == "" {
-		accessKey = c.Param("access_key")
-	}
-	accessSecret := c.DefaultQuery("access_secret", "")
-
-	return secret.Secret{
-		accessKey,
-		accessSecret,
 	}
 }
 
@@ -80,7 +67,7 @@ func main() {
 	exit := make(chan os.Signal)
 	signal.Notify(exit, os.Interrupt,
 		syscall.SIGTERM, syscall.SIGINT,
-		syscall.SIGHUP, syscall.SIGABRT, )
+		syscall.SIGHUP, syscall.SIGABRT)
 
 	endPoint := fmt.Sprintf(":%d", setting.HTTPPort)
 
@@ -93,11 +80,11 @@ func main() {
 	}
 	handle := routers.InitRouter()
 	server := http.Server{
-		Addr:endPoint,
-		Handler:handle,
-		WriteTimeout:setting.WriteTimeout,
-		ReadTimeout:setting.ReadTimeout,
-		MaxHeaderBytes:1<<20,
+		Addr:           endPoint,
+		Handler:        handle,
+		WriteTimeout:   setting.WriteTimeout,
+		ReadTimeout:    setting.ReadTimeout,
+		MaxHeaderBytes: 1 << 20,
 	}
 	go func() {
 		err := server.ListenAndServe()
@@ -106,8 +93,8 @@ func main() {
 		}
 	}()
 	<-exit
-	if err :=server.Close();err!=nil{
-		fmt.Printf("server close error %s",err)
+	if err := server.Close(); err != nil {
+		fmt.Printf("server close error %s", err)
 	}
 	fmt.Println("server close safe")
 }

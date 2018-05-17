@@ -29,7 +29,7 @@ func (myc *TestApi) GetS(c *gin.Context) {
 	// utils.RedisHandle.SetData("test1", "hhhhh", 0)
 	// utils.HttpHandle.Debug = true
 	data, err := utils.HttpHandle.Get("http://t-goada.gaodun.com/homework/oneStatisticsInfo?homework_id=33&is_complete_all=1", nil, nil)
-	fmt.Println(utils.RedisHandle.GetData("test1"))
+	fmt.Println(utils.GetRedisHandle().GetData("test1"))
 	fmt.Println(err)
 	// authentication := CreateSecretFromRequest(c)
 	// fmt.Println("Access key is " + authentication.AccessKey)

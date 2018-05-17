@@ -9,17 +9,20 @@ server:
     READ_TIMEOUT : 60
     WRITE_TIMEOUT : 60
 database:
-    TYPE : mysql
-    USER : gaodun_test
-    PASSWORD : 414639e58d
+    TYPE : 
+    USER : 
+    PASSWORD : 
     #127.0.0.1:3306
-    HOST : 114.55.11.155:3307
+    HOST : 
     NAME : 
     TABLE_PREFIX : 
 log:
     LOG_TYPE : gray
-    LOG_UDP : udp://g02.graylog.gaodunwangxiao.com:5504
+    LOG_UDP : udp://g02.graylog.xxxx.com:5504
     LOG_FIELDS : item:ginlog
     LOG_LEVEL : -1
     IS_SHOW_CONSOLE : true
+consul:
+    CONSUL_URL : test.consul.xxxx.com
+    CONSUL_LIST_NAME : gaodun/config_center/
 api:
